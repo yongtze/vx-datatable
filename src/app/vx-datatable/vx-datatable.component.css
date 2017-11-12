@@ -1,0 +1,96 @@
+.datatable {
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 400;
+  overflow: hidden;
+}
+.datatable-header {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #f0f0f6;
+  top: 0;
+  left: 0;
+  right: 15px;
+  height: 40px;
+  border-top: 1px solid #D6D6DB;
+  border-bottom: 1px solid #D6D6DB;
+}
+.datatable-vscroll-header {
+  box-sizing: border-box;
+  background-color: #f0f0f6;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 40px;
+  width: 15px;
+  display: block;
+  border-top: 1px solid #D6D6DB;
+  border-bottom: 1px solid #D6D6DB;
+}
+.datatable-header-cell {
+  display: block;
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: 300;
+  padding: 0px 10px;
+  text-align: left;
+  height: 40px;
+  line-height: 40px;
+  color: #282828;
+  cursor: default;
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */    
+}
+.datatable-scroll-middle {
+  box-sizing: border-box;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  bottom: 15px;
+  right: 15px;
+  overflow: hidden;
+}
+.datatable-vscroll {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 10px;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.1);
+  opacity: 0.5;
+}
+.datatable-hscroll {
+  position: absolute;
+  bottom: 0;
+  height: 10px;
+  left: 0;
+  right: 10px;
+  background-color: rgba(0,0,0,0.1);
+  opacity: 0.5;
+}
+.datatable-column {
+  position: absolute;
+}
+.datatable-cell {
+  display: block;
+  height: 40px;
+  line-height: 40px;
+  box-sizing: border-box;
+  padding: 0px 10px;
+  font-weight: 400;
+  font-size: 13px;
+  color: #555555;
+  overflow: hidden;
+  cursor: default;
+  border-bottom: 1px solid #f0f0f6;
+  background-color: #FCFCFF;
+}
+.datatable-cell.odd {
+/*  background-color: #f6f6f6; */
+}

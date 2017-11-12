@@ -1,0 +1,8 @@
+* {
+  box-sizing: border-box;
+}
+
+body,div,span,p,td,th {
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 13px;
+}

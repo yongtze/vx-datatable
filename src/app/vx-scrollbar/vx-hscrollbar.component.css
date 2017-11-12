@@ -1,0 +1,18 @@
+.hscrollbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 15px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  z-index:999;
+  background-color: #fff;
+}
+.hscrollbar-filler {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+}

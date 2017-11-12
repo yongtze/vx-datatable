@@ -1,0 +1,18 @@
+.vscrollbar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 15px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  box-sizing: border-box;
+  z-index:999;
+  background-color: #fff;
+/*  background-color: rgba(0, 0, 0, 0.05); */
+}
+.vscrollbar-filler {
+  position: absolute;
+  top: 0;
+  right: -1;
+  width: 1px;
+}
