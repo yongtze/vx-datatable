@@ -180,7 +180,6 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   }
 
   toggleSort(column: string) {
-    console.log("toggleSort(" + column + ")");
     this._dataStore.toggleSort(column);
     this.refresh(true);
   }

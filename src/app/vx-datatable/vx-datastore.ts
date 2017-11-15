@@ -31,55 +31,59 @@ export class Sort {
 
   comparator(type:Type):Function {
     let column = this.column;
-    let direction = this.direction;
+    let direction:number = this.direction === Direction.Desc ? -1 : 1;
     let comparator;
     if (type === Type.String) {
-      comparator = (obj1, obj2) => {
+      return (obj1, obj2) => {
         let a = obj1 ? obj1[column] : null;
         let b = obj2 ? obj2[column] : null;
         if (a == null && b == null) {
           return 0;
         } else if (a == null && b != null) {
-          return -1;
+          return -1 * direction;
         } else if (a != null && b == null) {
-          return 1;
+          return 1 * direction;
         } else {
-          return a.localeCompare(b);
+          return a.localeCompare(b) * direction;
         }
       }
     } else if (type === Type.Number) {
-      comparator = (obj1, obj2) => {
-        let a = obj1 ? obj1[column] : null;
-        let b = obj2 ? obj2[column] : null;
-        return a - b;
-      };
-    } else if (type === Type.Date) {
-      comparator = (obj1, obj2) => {
+      return (obj1, obj2) => {
         let a = obj1 ? obj1[column] : null;
         let b = obj2 ? obj2[column] : null;
         if (a == null && b == null) {
           return 0;
         } else if (a == null && b != null) {
-          return -1;
+          return -1 * direction;
         } else if (a != null && b == null) {
-          return 1;
+          return 1 * direction;
         } else {
-          return a.getTime() - b.getTime();
+          return (a - b) * direction;
+        }
+      };
+    } else if (type === Type.Date) {
+      return (obj1, obj2) => {
+        let a = obj1 ? obj1[column] : null;
+        let b = obj2 ? obj2[column] : null;
+        if (a == null && b == null) {
+          return 0;
+        } else if (a == null && b != null) {
+          return -1 * direction;
+        } else if (a != null && b == null) {
+          return 1 * direction;
+        } else {
+          return (a.getTime() - b.getTime()) * direction;
         }
       }
     } else if (type === Type.Boolean) {
-      comparator = (obj1, obj2) => {
+      return (obj1, obj2) => {
         let a = obj1 ? obj1[column] : null;
         let b = obj2 ? obj2[column] : null;
-        return (a === b) ? 0 : (a ? -1 : 1);
+        return ((a === b) ? 0 : (a ? -1 : 1)) * direction;
       };
     } else {
-      comparator = (obj1, obj2) => 0;
+      return (obj1, obj2) => 0;
     }
-    if (direction === Direction.Desc) {
-      return (obj1, obj2) => comparator.apply(obj2, obj1);
-    }
-    return comparator;
   }
 }
 
@@ -182,8 +186,6 @@ export class DataStore {
   applySorts(data:any[]) {
     if (data && this.sorts.length > 0) {
       let comparators = this.sorts.map(s => s.comparator(this.schema.findColumnByName(s.column).type));
-      data.sort(comparators[0] as (a, b) => number);
-/*
       data.sort((obj1, obj2) => {
         var result = 0;
         for (let i = 0; result === 0 && i < comparators.length; i++) {
@@ -191,7 +193,6 @@ export class DataStore {
         }
         return result;
       });
-*/
     }
     return data;
   }
@@ -220,7 +221,7 @@ export class DataStore {
       let predicates = this.filters.map(f => f.predicate());
       return data.filter(row => predicates.findIndex(p => !p(row)) < 0);
     }
-    return data;
+    return data.slice();
   }
 
   clearFilters() {
