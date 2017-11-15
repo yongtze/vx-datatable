@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { VxVScrollBarComponent } from '../vx-scrollbar/vx-vscrollbar.component';
 import { VxHScrollBarComponent } from '../vx-scrollbar/vx-hscrollbar.component';
 
+import { DataStore, Schema, Column, Type, Direction, Sort, Filter, Operator } from './vx-datastore';
 
 @Component({
   selector: 'vx-column',
@@ -17,6 +18,7 @@ export class VxColumnComponent implements OnInit {
   @Input() minWidth: number;
   @Input() maxWidth: number;
   @Input() visible: boolean = true;
+  @Input() type: string = "string";
 
   @Host() datatable: VxDataTableComponent;
 
@@ -100,7 +102,7 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   }
 
   ngAfterContentInit() {
-    if (this.columnComponents) {
+    if (this.columnComponents && this.columnComponents.length > 0) {
       this.columns = this.columnComponents.toArray();
     }
     this.refresh();
@@ -113,24 +115,74 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   }
 
   _data: any[];
+  _dataStore: DataStore = new DataStore();
 
   @Input()
   set data(data: any[]) {
     this._data = data;
+    this._dataStore.data = data;
+    this._dataStore.refresh();
   }
   
   get data(): any[] {
-    return this._data;
+    return this._dataStore.filtered;
+  }
+
+  set dataStore(dataStore: DataStore) {
+    this._dataStore = dataStore;
+  }
+
+  get dataStore(): DataStore {
+    return this._dataStore;
   }
 
   @Input()
   set columns(columns:any[]) {
     this._columns = columns;
     this.layoutColumns();
+
+    var cols = this._columns.map(c => {
+      let type;
+      if (c.type === "number") {
+        type = Type.Number;
+      } else if (c.type === "date") {
+        type = Type.Date;
+      } else {
+        type = Type.String;
+      }
+      return new Column(c.id, type);
+    });
+    this._dataStore.schema = new Schema(cols);
   }
 
   get columns() {
     return this._columns;
+  }
+
+  addFilter(column: string, operator: Operator|string, value?: any) {
+    this._dataStore.addFilter(column, operator, value);
+    this.refresh(true);
+  }
+
+  removeFilter(column: string) {
+    this._dataStore.removeFilter(column);
+    this.refresh(true);
+  }
+
+  addSort(column: string, direction: Direction|string) {
+    this._dataStore.addSort(column, direction);
+    this.refresh(true);
+  }
+
+  removeSort(column: string) {
+    this._dataStore.removeSort(column);
+    this.refresh(true);
+  }
+
+  toggleSort(column: string) {
+    console.log("toggleSort(" + column + ")");
+    this._dataStore.toggleSort(column);
+    this.refresh(true);
   }
 
   refreshScrollbars() {
@@ -169,13 +221,14 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     this.columnTop = (this.startIndex*this.rowHeight) - this.scrollTop;
   }
 
-  refresh() {
+  refresh(force: boolean = false) {
     let _startIndex = this.startIndex;
     this.resize();
-    if (this.data && (this.startIndex != _startIndex || !this.rowsInView)) {
-      this.rowsInView = this.data.slice(this.startIndex, this.endIndex);
+    let data = this.data;
+    if (data && (force || this.startIndex != _startIndex || !this.rowsInView)) {
+      this.rowsInView = data.slice(this.startIndex, this.endIndex);
     }
-    if (this.data && this._columns) {
+    if (data && this._columns) {
       this.columnsInView = this._columns.slice(this.startColumnIndex, this.endColumnIndex);
     }
   }
@@ -185,11 +238,11 @@ export class VxDataTableComponent implements OnInit, OnChanges {
       let clientHeight = this.scroll.nativeElement.clientHeight;
       let clientWidth = this.scroll.nativeElement.clientWidth;
       this.scrollTop = Math.min(
-        Math.max(this.scrollTop - event.wheelDeltaY, 0),
+        Math.max(this.scrollTop + event.deltaY, 0),
         this.data.length * this.rowHeight - clientHeight
       );
       this.scrollLeft = Math.min(
-        Math.max(this.scrollLeft - event.wheelDeltaX, 0),
+        Math.max(this.scrollLeft + event.deltaX, 0),
         this.totalWidth - clientWidth
       );
       this.refresh();
