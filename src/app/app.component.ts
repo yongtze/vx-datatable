@@ -16,7 +16,7 @@ export class AppComponent {
   constructor() {
     this.data = this.generateData(10000);
     var cols = [];
-    for (var i = 1; i < 100; i++) {
+    for (var i = 1; i <= 25; i++) {
       cols.push({ 'id': 'col_' + i, 'title': 'Column ' + i, 'width': 100, type: 'string' });
     }
     this.columns = cols;
@@ -32,7 +32,7 @@ export class AppComponent {
     var data = [];
     for (var i = 1; i <= n; i++) {
       var item = {};
-      for (var j = 1; j <= 100; j++) {
+      for (var j = 1; j <= 25; j++) {
         item['col_' + j] = "" + this.getRandomInt(1, 100);
       }
       data.push(item);

@@ -1,6 +1,6 @@
 <div class="datatable" [ngClass]="css">
   <div #headerMiddle class="datatable-header" [scrollLeft]="scrollLeft">
-    <div *ngFor="let c of columnsInView" class="datatable-header-cell" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px' }" (click)="toggleSort(c.id)"><ng-container *ngTemplateOutlet="c.headerTemplate ? c.headerTemplate : _defaultHeaderTpl; context: { $implicit: c, column: c, index: index+startColumnIndex }"></ng-container></div>
+    <div *ngFor="let c of columnsInView" class="datatable-header-cell" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px' }" (click)="toggleSort(c.id)"><ng-container *ngTemplateOutlet="c.headerTemplate ? c.headerTemplate : _defaultHeaderTpl; context: { $implicit: c, column: c, index: index+startColumnIndex, table: this }"></ng-container></div>
   </div>
   <div class="datatable-vscroll-header"></div>
   <div #scroll class="datatable-scroll-middle" (wheel)="wheel($event)" [style.top]="headerRowHeight + 1" [scrollLeft]="scrollLeft">
@@ -13,5 +13,9 @@
   <vx-vscrollbar #vscrollbar [top]="headerRowHeight" width="15" (scroll)="vscroll($event)"></vx-vscrollbar>
   <vx-hscrollbar #hscrollbar left="0" right="15" height="15" (scroll)="hscroll($event)"></vx-hscrollbar>
 </div>
-<ng-template #defaultHeaderTpl let-column>{{column.title}} <i ng-if="column.sort" class="fa datatable-icon" [ngClass]="{ 'fa-long-arrow-up': column.sort === 'asc', 'fa-long-arrow-down': column.sort === 'desc' }" aria-hidden="true"></i></ng-template>
+<ng-template #defaultHeaderTpl let-column>
+  <div class="datatable-header-title">{{column.title}}</div>
+  <div class="datatable-header-markers"><i *ngIf="column.filter" class="fa fa-filter datatable-icon" aria-hidden="true"></i> <i *ngIf="column.sort" class="fa datatable-icon" [ngClass]="{ 'fa-long-arrow-up': column.sort === 'asc', 'fa-long-arrow-down': column.sort === 'desc' }" aria-hidden="true"></i></div>
+  <div class="datatable-header-control"><a href="javascript:void(0)"><i class="fa fa-chevron-down datatable-icon" aria-hidden="true"></i></a></div>
+</ng-template>
 <ng-template #defaultTpl let-row let-column="column">{{row[column.id]}}</ng-template>

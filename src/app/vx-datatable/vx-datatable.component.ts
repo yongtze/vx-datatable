@@ -161,11 +161,15 @@ export class VxDataTableComponent implements OnInit, OnChanges {
 
   addFilter(column: string, operator: Operator|string, value?: any) {
     this._dataStore.addFilter(column, operator, value);
+    let col = this._columns.find(c => c.id === column);
+    col.filter = true;
     this.refresh(true);
   }
 
   removeFilter(column: string) {
     this._dataStore.removeFilter(column);
+    let col = this._columns.find(c => c.id === column);
+    col.filter = this._dataStore.hasFilter(column);
     this.refresh(true);
   }
 
