@@ -169,6 +169,10 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     this.refresh(true);
   }
 
+  hasFilter(column: string): boolean {
+    return this._dataStore.hasFilter(column);
+  }
+
   addSort(column: string, direction: Direction|string) {
     this._dataStore.addSort(column, direction);
     this.refresh(true);
@@ -181,7 +185,22 @@ export class VxDataTableComponent implements OnInit, OnChanges {
 
   toggleSort(column: string) {
     this._dataStore.toggleSort(column);
+    let sort = this._dataStore.getSort(column);
+    let col = this.columns.find(c => c.id === column);
+    if (sort == null) {
+      col.sort = null;
+    } else {
+      col.sort = sort.direction;
+    }
     this.refresh(true);
+  }
+
+  hasSort(column: string): boolean {
+    return this._dataStore.hasSort(column);
+  }
+
+  getSort(column: string): Sort {
+    return this._dataStore.getSort(column);
   }
 
   refreshScrollbars() {

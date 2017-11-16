@@ -13,5 +13,5 @@
   <vx-vscrollbar #vscrollbar [top]="headerRowHeight" width="15" (scroll)="vscroll($event)"></vx-vscrollbar>
   <vx-hscrollbar #hscrollbar left="0" right="15" height="15" (scroll)="hscroll($event)"></vx-hscrollbar>
 </div>
-<ng-template #defaultHeaderTpl let-column>{{column.title}}</ng-template>
+<ng-template #defaultHeaderTpl let-column>{{column.title}} <i ng-if="column.sort" class="fa datatable-icon" [ngClass]="{ 'fa-long-arrow-up': column.sort === 'asc', 'fa-long-arrow-down': column.sort === 'desc' }" aria-hidden="true"></i></ng-template>
 <ng-template #defaultTpl let-row let-column="column">{{row[column.id]}}</ng-template>

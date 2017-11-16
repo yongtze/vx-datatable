@@ -94,3 +94,7 @@
 .datatable-cell.odd {
 /*  background-color: #f6f6f6; */
 }
+.datatable-icon {
+  color: #666;
+  padding: 0 5px;
+}

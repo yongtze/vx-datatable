@@ -159,6 +159,10 @@ export class DataStore {
     this.refresh();
   }
 
+  getSort(column: string): Sort {
+    return this.sorts.find(s => s.column === column);
+  }
+
   hasSort(column: string): boolean {
     return this.sorts.findIndex(s => s.column === column) >= 0;
   }
