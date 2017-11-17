@@ -256,7 +256,7 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   }
 
   wheel(event) {
-    if (this.data) {
+    if (this._data) {
       let clientHeight = this.scroll.nativeElement.clientHeight;
       let clientWidth = this.scroll.nativeElement.clientWidth;
       this.scrollTop = Math.min(
