@@ -66,13 +66,29 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   @Input() headerRowHeight: number = 40;
   @Input() rowHeight: number = 40;
 
-  @Input() leftSplit: number;
-  @Input() rightSplit: number;
+  @Input() leftSplit: number = 0;
+  @Input() rightSplit: number = 0;
 
   @Input() css: string;
 
-  scrollTop: number = 0;
-  scrollLeft: number = 0;
+  private _scrollTop: number = 0;
+  private _scrollLeft: number = 0;
+
+  set scrollTop(scrollTop: number) {
+    this._scrollTop = scrollTop;
+  }
+
+  get scrollTop(): number {
+    return this._scrollTop;
+  }
+
+  set scrollLeft(scrollLeft: number) {
+    this._scrollLeft = scrollLeft;
+  }
+
+  get scrollLeft(): number {
+    return this._scrollLeft;
+  }
 
   @ViewChild('defaultHeaderTpl')
   private _defaultHeaderTpl: TemplateRef<any>;
@@ -83,18 +99,24 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   @ViewChild("vscrollbar") vscrollbar: VxVScrollBarComponent;
   @ViewChild("hscrollbar") hscrollbar: VxHScrollBarComponent;
 
-  startIndex:number = 0;
-  endIndex:number;
-  rowsInView: any[];
+  private _startRowIndex:number = 0;
+  private _endRowIndex:number;
+  private _rowsInView: any[];
+
+  get startRowIndex(): number {
+    return this._startRowIndex;
+  }
+
+  get endRowIndex(): number {
+    return this._endRowIndex;
+  }
+
+  get rowsInView(): any[] {
+    return this._rowsInView;
+  }
 
   private totalWidth:number;
 
-  @ContentChildren(VxColumnComponent) columnComponents: QueryList<VxColumnComponent>;
-  private _columns: any[];
-  columnTop: number = 0;
-  startColumnIndex:number = 0;
-  endColumnIndex:number;
-  columnsInView: any[];
 
   constructor() { }
 
@@ -105,6 +127,7 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     if (this.columnComponents && this.columnComponents.length > 0) {
       this.columns = this.columnComponents.toArray();
     }
+    this.layout();
     this.refresh();
     this.refreshScrollbars();
   }
@@ -112,6 +135,80 @@ export class VxDataTableComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.refresh();
     this.refreshScrollbars();
+  }
+
+  @ContentChildren(VxColumnComponent) columnComponents: QueryList<VxColumnComponent>;
+  private _columns: any[];
+
+  @Input()
+  set columns(columns:any[]) {
+    this._columns = columns;
+
+    var cols = this._columns.map(c => {
+      let type;
+      if (c.type === "number") {
+        type = Type.Number;
+      } else if (c.type === "date") {
+        type = Type.Date;
+      } else {
+        type = Type.String;
+      }
+      return new Column(c.id, type);
+    });
+    this._dataStore.schema = new Schema(cols);
+  }
+
+  get columns() {
+    return this._columns;
+  }
+
+  private _viewTopOffset: number = 0;
+
+  get viewTopOffset(): number {
+    return this._viewTopOffset;
+  }
+
+  private _leftColumns: any[];
+  private _leftWidth: number = 0;
+  private _middleColumns: any[];
+  private _middleLeft: number = 0;
+  private _middleWidth: number;
+  private _middleColumnStart: number;
+  private _middleColumnEnd: number;
+  private _middleColumnsInView: any[];
+  private _rightColumns: any[];
+  private _rightWidth: number = 0;
+
+  get leftColumns(): any[] {
+    return this._leftColumns;
+  }
+
+  get leftWidth(): number {
+    return this._leftWidth;
+  }
+
+  get middleColumns(): any[] {
+    return this._middleColumns;
+  }
+
+  get middleColumnsInView(): any[] {
+    return this._middleColumnsInView;
+  }
+
+  get middleLeft(): number {
+    return this._middleLeft;
+  }
+
+  get middleWidth(): number {
+    return this._middleWidth;
+  }
+
+  get rightColumns(): any[] {
+    return this._rightColumns;
+  }
+
+  get rightWidth(): number {
+    return this._rightWidth;
   }
 
   _data: any[];
@@ -134,29 +231,6 @@ export class VxDataTableComponent implements OnInit, OnChanges {
 
   get dataStore(): DataStore {
     return this._dataStore;
-  }
-
-  @Input()
-  set columns(columns:any[]) {
-    this._columns = columns;
-    this.layoutColumns();
-
-    var cols = this._columns.map(c => {
-      let type;
-      if (c.type === "number") {
-        type = Type.Number;
-      } else if (c.type === "date") {
-        type = Type.Date;
-      } else {
-        type = Type.String;
-      }
-      return new Column(c.id, type);
-    });
-    this._dataStore.schema = new Schema(cols);
-  }
-
-  get columns() {
-    return this._columns;
   }
 
   addFilter(column: string, operator: Operator|string, value?: any) {
@@ -187,7 +261,7 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     this.refresh(true);
   }
 
-  toggleSort(column: string) {
+  toggleSort(column: string, event: any) {
     this._dataStore.toggleSort(column);
     let sort = this._dataStore.getSort(column);
     let col = this.columns.find(c => c.id === column);
@@ -196,6 +270,9 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     } else {
       col.sort = sort.direction;
     }
+    //let dim = { left: event.target.offsetLeft, top: event.target.offsetTop, width: event.target.offsetWidth, height: event.target.offsetHeight };
+    //let rect = event.target.getBoundingClientRect();
+//    console.log(rect);
     this.refresh(true);
   }
 
@@ -214,44 +291,75 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     }
   }
 
-  layoutColumns() {
-    var left:number = 0;
-    this.totalWidth = 0;
-    this._columns.forEach((c) => {
+  layoutColumnsPosition(columns: any[], leftOffset:number = 0): number {
+    var left:number = leftOffset;
+    var width:number = 0;
+    columns.forEach(c => {
       c.left = left;
       c.layoutWidth = c.width ? +c.width : 200;
-      left = left + c.layoutWidth;
-      this.totalWidth += c.layoutWidth;
+      left += c.layoutWidth;
+      width += c.layoutWidth;
     });
+    return width;
   }
 
-  resize() {
-    let clientHeight: number = this.scroll.nativeElement.clientHeight;
-    let clientWidth:number = this.scroll.nativeElement.clientWidth;
-    this.startIndex = this.data ? Math.floor(this.scrollTop / this.rowHeight) : undefined;
-    this.endIndex = this.data ? Math.min(this.data.length, Math.ceil((this.scrollTop + clientHeight) / this.rowHeight) + 1) : undefined;
-
-    if (this._columns) {
-      let idx0 = this._columns.findIndex((c, i) => c.left <= this.scrollLeft && this.scrollLeft <= c.left + c.layoutWidth);
-      this.startColumnIndex = idx0 < 0 ? 0 : idx0;
-
-      let right = this.scrollLeft + clientWidth;
-      let idx = this._columns.findIndex((c, i) => c.left <= right && right <= c.left + c.layoutWidth);
-      this.endColumnIndex = idx < 0 ? this._columns.length : idx+1;
+  layoutColumns(clientWidth: number, clientHeight: number) {
+    if (this.leftSplit > 0) {
+      this._leftColumns = this._columns.slice(0, this.leftSplit);
+      this._leftWidth = this.layoutColumnsPosition(this._leftColumns);
+      this._middleLeft = this._leftWidth + 1;
+    } else {
+      this._leftColumns = null;
+      this._leftWidth = 0;
+      this._middleLeft = 0;
+    }
+    
+    if (this.rightSplit > 0) {
+      this._rightColumns = this._columns.slice(this._columns.length - this.rightSplit);
+      this._rightWidth = this.layoutColumnsPosition(this._rightColumns);
+    } else {
+      this._rightColumns = null;
+      this._rightWidth = 0;
     }
 
-    this.columnTop = (this.startIndex*this.rowHeight) - this.scrollTop;
+    if (this.leftSplit == 0 && this.rightSplit == 0) {
+      this._middleColumns = this._columns;
+    } else {
+      this._middleColumns = this._columns.slice(Math.max(0, this.leftSplit), this._columns.length - this.rightSplit);
+    }
+    this._middleWidth = this.layoutColumnsPosition(this._middleColumns, this._leftWidth);
+    this.totalWidth = this._leftWidth + this._middleWidth + this._rightWidth;
+  }
+
+  layoutScrollView(clientWidth: number, clientHeight: number) {
+    this._startRowIndex = this.data ? Math.floor(this.scrollTop / this.rowHeight) : undefined;
+    this._endRowIndex = this.data ? Math.min(this.data.length, Math.ceil((this.scrollTop + clientHeight) / this.rowHeight) + 1) : undefined;
+    if (this._middleColumns) {
+      let left = this.scrollLeft + this._leftWidth;
+      let start = this._middleColumns.findIndex((c, i) => c.left <= left && left <= c.left + c.layoutWidth);
+      this._middleColumnStart = start < 0 ? 0 : start;
+  
+      let right = this.scrollLeft + this._leftWidth + clientWidth - this._rightWidth;
+      let end = this._middleColumns.findIndex((c, i) => c.left <= right && right <= c.left + c.layoutWidth);
+      this._middleColumnEnd = end < 0 ? this._columns.length : end+1;
+      this._middleColumnsInView = this._middleColumns.slice(this._middleColumnStart, this._middleColumnEnd);
+    }
+    this._viewTopOffset = (this._startRowIndex*this.rowHeight) - this.scrollTop;
+  }
+
+  layout() {
+    let clientHeight: number = this.scroll.nativeElement.clientHeight;
+    let clientWidth:number = this.scroll.nativeElement.clientWidth;
+    this.layoutColumns(clientWidth, clientHeight);
+    this.layoutScrollView(clientWidth, clientHeight);
   }
 
   refresh(force: boolean = false) {
-    let _startIndex = this.startIndex;
-    this.resize();
+    let _startIndex = this._startRowIndex;
+    this.layout();
     let data = this.data;
-    if (data && (force || this.startIndex != _startIndex || !this.rowsInView)) {
-      this.rowsInView = data.slice(this.startIndex, this.endIndex);
-    }
-    if (data && this._columns) {
-      this.columnsInView = this._columns.slice(this.startColumnIndex, this.endColumnIndex);
+    if (data && (force || this._startRowIndex != _startIndex || !this.rowsInView)) {
+      this._rowsInView = data.slice(this._startRowIndex, this._endRowIndex);
     }
   }
 

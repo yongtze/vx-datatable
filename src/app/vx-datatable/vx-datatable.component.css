@@ -5,21 +5,29 @@
   overflow: hidden;
 }
 .datatable-header {
-  z-index: 100;
+  z-index: 1000;
   position: absolute;
   display: block;
   overflow: hidden;
   box-sizing: border-box;
   background-color: #f0f0f6;
   top: 0;
-  left: 0;
-  right: 15px;
   height: 40px;
   border-top: 1px solid #D6D6DB;
   border-bottom: 1px solid #D6D6DB;
 }
+.datatable-header-left {
+  left: 0;
+}
+.datatable-header-middle {
+  left: 0;
+  right: 15px;
+}
+.datatable-header-right {
+  right: 15px;
+}
 .datatable-header-shadow {
-  z-index: 50;
+  z-index: 1000;
   position: absolute;
   display: block;
   overflow: hidden;
@@ -29,7 +37,7 @@
   left: 0;
   right: 0;
   height: 40px;
-  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
 }
 .datatable-vscroll-header {
   box-sizing: border-box;
@@ -63,18 +71,47 @@
   -ms-user-select: none;      /* IE 10+ */
   user-select: none;          /* Likely future */    
 }
-.datatable-scroll-middle {
+.datatable-body-left {
   box-sizing: border-box;
   position: absolute;
+  z-index: 50;
   top: 40px;
+  left: 0;
+  bottom: 15px;
+  overflow: hidden;
+}
+.datatable-body-left-shadow {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 90;
+  top: 41px;
+  left: 0;
+  bottom: 15px;
+  overflow: hidden;
+  background-color: transparent;
+  box-shadow: 1px 0px 3px rgba(0, 0, 0, 0.15);
+}
+.datatable-body-middle {
+  box-sizing: border-box;
+  position: absolute;
+  top: 41px;
   left: 0;
   bottom: 15px;
   right: 15px;
   overflow: hidden;
 }
+.datatable-body-right {
+  box-sizing: border-box;
+  position: absolute;
+  top: 41px;
+  right: 15px;
+  bottom: 15px;
+  overflow: hidden;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+}
 .datatable-vscroll {
   position: absolute;
-  top: 40px;
+  top: 41px;
   right: 0;
   width: 10px;
   bottom: 0;
