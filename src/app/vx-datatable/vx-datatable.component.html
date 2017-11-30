@@ -1,5 +1,5 @@
 <div class="datatable" [ngClass]="css" (wheel)="wheel($event)">
-  <div #headerMiddle class="datatable-header datatable-header-middle" [scrollLeft]="scrollLeft">
+  <div #headerMiddle class="datatable-header datatable-header-middle" [scrollLeft]="scrollLeft" [style.left]="middleLeft + 'px'" [style.right]="(15 + rightWidth) + 'px'" >
     <div *ngFor="let c of middleColumnsInView" class="datatable-header-cell" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px' }" (click)="toggleSort(c.id, $event)"><ng-container *ngTemplateOutlet="c.headerTemplate ? c.headerTemplate : _defaultHeaderTpl; context: { $implicit: c, column: c, index: index+startColumnIndex, table: this }"></ng-container></div>
   </div>
   <div #headerLeft *ngIf="leftColumns" class="datatable-header datatable-header-left" [style.width]="leftWidth + 'px'">
@@ -10,7 +10,7 @@
   </div>
   <div *ngIf="scrollTop > 0" class="datatable-header-shadow"></div>
   <div class="datatable-vscroll-header"></div>
-  <div #scroll class="datatable-body-middle" [style.top]="(headerRowHeight + 1) + 'px'" [scrollLeft]="scrollLeft">
+  <div #scroll class="datatable-body-middle" [style.top]="headerRowHeight + 'px'" [style.left]="middleLeft + 'px'" [style.right]="(15 + rightWidth) + 'px'" [scrollLeft]="scrollLeft">
     <div class="datatable-column" *ngFor="let c of middleColumnsInView" [ngClass]="{ 'datatable-column-first': first, 'datatable-column-last': last }" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px', top: viewTopOffset + 'px' }">
       <div class="datatable-cell" *ngFor="let row of rowsInView; let index=index" [ngClass]="{ 'odd': (startRowIndex+index)%2==1, 'even': (startRowIndex+index)%2==0 }">
         <ng-container *ngTemplateOutlet="_defaultTpl; context: { $implicit: row, row: row, column: c, index: startRowIndex+index }"></ng-container>
@@ -19,21 +19,21 @@
   </div>
   <div *ngIf="leftColumns && scrollLeft > 0" class="datatable-body-left-shadow" [style.width]="(leftWidth-1) + 'px'">
   </div>
-  <div *ngIf="leftColumns" class="datatable-body-left" [ngStyle]="{ top: (headerRowHeight + 1) + 'px', width: leftWidth + 'px' }">
+  <div *ngIf="leftColumns" class="datatable-body-left" [ngStyle]="{ top: headerRowHeight + 'px', width: leftWidth + 'px' }">
     <div class="datatable-column" *ngFor="let c of leftColumns" [ngClass]="{ 'datatable-column-first': first, 'datatable-column-last': last }" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px', top: viewTopOffset + 'px' }">
       <div class="datatable-cell" *ngFor="let row of rowsInView; let index=index" [ngClass]="{ 'odd': (startRowIndex+index)%2==1, 'even': (startRowIndex+index)%2==0 }">
         <ng-container *ngTemplateOutlet="_defaultTpl; context: { $implicit: row, row: row, column: c, index: startRowIndex+index }"></ng-container>
       </div>
     </div>
   </div>
-  <div *ngIf="rightColumns" class="datatable-body-right" [style.top]="(headerRowHeight + 1) + 'px'" [style.width]="rightWidth + 'px'">
+  <div *ngIf="rightColumns" class="datatable-body-right" [style.top]="headerRowHeight + 'px'" [style.width]="rightWidth + 'px'">
     <div class="datatable-column" *ngFor="let c of rightColumns" [ngClass]="{ 'datatable-column-first': first, 'datatable-column-last': last }" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px', top: viewTopOffset + 'px' }">
       <div class="datatable-cell" *ngFor="let row of rowsInView; let index=index" [ngClass]="{ 'odd': (startRowIndex+index)%2==1, 'even': (startRowIndex+index)%2==0 }">
         <ng-container *ngTemplateOutlet="_defaultTpl; context: { $implicit: row, row: row, column: c, index: startRowIndex+index }"></ng-container>
       </div>
     </div>
   </div>
-  <vx-vscrollbar #vscrollbar [top]="headerRowHeight+1" width="15" (scroll)="vscroll($event)"></vx-vscrollbar>
+  <vx-vscrollbar #vscrollbar [top]="headerRowHeight" width="15" (scroll)="vscroll($event)"></vx-vscrollbar>
   <vx-hscrollbar #hscrollbar left="0" right="15" height="15" (scroll)="hscroll($event)"></vx-hscrollbar>
 </div>
 <ng-template #defaultHeaderTpl let-column>

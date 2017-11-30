@@ -307,7 +307,7 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     if (this.leftSplit > 0) {
       this._leftColumns = this._columns.slice(0, this.leftSplit);
       this._leftWidth = this.layoutColumnsPosition(this._leftColumns);
-      this._middleLeft = this._leftWidth + 1;
+      this._middleLeft = this._leftWidth;
     } else {
       this._leftColumns = null;
       this._leftWidth = 0;
@@ -327,22 +327,24 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     } else {
       this._middleColumns = this._columns.slice(Math.max(0, this.leftSplit), this._columns.length - this.rightSplit);
     }
-    this._middleWidth = this.layoutColumnsPosition(this._middleColumns, this._leftWidth);
-    this.totalWidth = this._leftWidth + this._middleWidth + this._rightWidth;
+    this._middleWidth = this.layoutColumnsPosition(this._middleColumns);
+    this.totalWidth = this._middleWidth;
   }
 
   layoutScrollView(clientWidth: number, clientHeight: number) {
     this._startRowIndex = this.data ? Math.floor(this.scrollTop / this.rowHeight) : undefined;
     this._endRowIndex = this.data ? Math.min(this.data.length, Math.ceil((this.scrollTop + clientHeight) / this.rowHeight) + 1) : undefined;
     if (this._middleColumns) {
-      let left = this.scrollLeft + this._leftWidth;
+      let left = this.scrollLeft;
       let start = this._middleColumns.findIndex((c, i) => c.left <= left && left <= c.left + c.layoutWidth);
       this._middleColumnStart = start < 0 ? 0 : start;
   
-      let right = this.scrollLeft + this._leftWidth + clientWidth - this._rightWidth;
+      let right = this.scrollLeft + clientWidth;
       let end = this._middleColumns.findIndex((c, i) => c.left <= right && right <= c.left + c.layoutWidth);
       this._middleColumnEnd = end < 0 ? this._columns.length : end+1;
       this._middleColumnsInView = this._middleColumns.slice(this._middleColumnStart, this._middleColumnEnd);
+      // console.log(this._middleColumns);
+      // console.log(this._middleColumnsInView);
     }
     this._viewTopOffset = (this._startRowIndex*this.rowHeight) - this.scrollTop;
   }
