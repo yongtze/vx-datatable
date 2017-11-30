@@ -168,6 +168,9 @@ export class VxDataTableComponent implements OnInit, OnChanges {
     return this._viewTopOffset;
   }
 
+  scrollLeftMost: boolean;
+  scrollRightMost: boolean;
+
   private _leftColumns: any[];
   private _leftWidth: number = 0;
   private _middleColumns: any[];
@@ -343,8 +346,11 @@ export class VxDataTableComponent implements OnInit, OnChanges {
       let end = this._middleColumns.findIndex((c, i) => c.left <= right && right <= c.left + c.layoutWidth);
       this._middleColumnEnd = end < 0 ? this._columns.length : end+1;
       this._middleColumnsInView = this._middleColumns.slice(this._middleColumnStart, this._middleColumnEnd);
-      // console.log(this._middleColumns);
-      // console.log(this._middleColumnsInView);
+
+      this.scrollLeftMost = this.scrollLeft === 0;
+      this.scrollRightMost = this.scrollLeft + clientWidth === this.totalWidth;
+
+      //console.log("rightMost: " + this.scrollRightMost);
     }
     this._viewTopOffset = (this._startRowIndex*this.rowHeight) - this.scrollTop;
   }
