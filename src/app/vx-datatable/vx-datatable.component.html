@@ -17,7 +17,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="leftColumns && scrollLeft > 0" class="datatable-body-left-shadow" [style.width]="(leftWidth-1) + 'px'">
+  <div *ngIf="leftColumns && !scrollLeftMost" class="datatable-body-left-shadow" [style.width]="(leftWidth-1) + 'px'">
   </div>
   <div *ngIf="leftColumns" class="datatable-body-left" [ngStyle]="{ top: headerRowHeight + 'px', width: leftWidth + 'px' }">
     <div class="datatable-column" *ngFor="let c of leftColumns" [ngClass]="{ 'datatable-column-first': first, 'datatable-column-last': last }" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px', top: viewTopOffset + 'px' }">
@@ -26,6 +26,7 @@
       </div>
     </div>
   </div>
+  <div *ngIf="rightColumns && !scrollRightMost" class="datatable-body-right-shadow" [style.width]="rightWidth + 'px'"></div>
   <div *ngIf="rightColumns" class="datatable-body-right" [style.top]="headerRowHeight + 'px'" [style.width]="rightWidth + 'px'">
     <div class="datatable-column" *ngFor="let c of rightColumns" [ngClass]="{ 'datatable-column-first': first, 'datatable-column-last': last }" [ngStyle]="{ left: c.left + 'px', width: c.layoutWidth + 'px', top: viewTopOffset + 'px' }">
       <div class="datatable-cell" *ngFor="let row of rowsInView; let index=index" [ngClass]="{ 'odd': (startRowIndex+index)%2==1, 'even': (startRowIndex+index)%2==0 }">
